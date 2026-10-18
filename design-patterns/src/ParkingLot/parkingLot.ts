@@ -19,16 +19,25 @@ FeeCalculator (later, if needed)	Calculate parking charges
 import { ParkingFloor } from "./parkingFloor.js";
 import { ParkingSpot } from "./parkingSpot.js";
 import { Vehicle, VehicleType } from "./vehicle.js";
-import { ParkingTicket } from "./parkingTicket.js";
+import { ParkingTicket, PaymentStatus, TicketStatus } from "./parkingTicket.js";
 import { FeeCalculator } from "./feeCalculator.js";
+import { Payment } from "./payment.js";
+
+interface ExitReceipt {
+    ticketId: string;
+    registrationNo: string;
+    amountPaid: number;
+    exitTime: Date;
+}
 
 export class ParkingLot {
     private parkingFloors: ParkingFloor[] = [];
-    private activeTickets = new Map<String, ParkingTicket>;
+    private activeTickets = new Map<string, ParkingTicket>();
 
     constructor(
-        private readonly feeCalculator: FeeCalculator
-    ) {}
+        private readonly feeCalculator: FeeCalculator,
+        private readonly payment: Payment,
+    ) { }
 
     addParkingFloor(floor: ParkingFloor): void {
         const floorAddedAlready = this.parkingFloors.some((pf) => pf.getFloorNumber() === floor.getFloorNumber());
@@ -79,15 +88,34 @@ export class ParkingLot {
             throw new Error("No active ticket found");
         }
 
-        const fee = this.feeCalculator.calculateFee(
-            ticket,
-            new Date()
-        );
+        let fee;
+        const currDate = new Date();
+        const paymentStatus = ticket.getPaymentStatus();
+        if (paymentStatus !== PaymentStatus.Success) {
+            fee = this.feeCalculator.calculateFee(
+                ticket,
+                currDate
+            );
+            const paymentCompleted = this.payment.pay(fee);
 
+            if (!paymentCompleted) {
+                ticket.markPaymentFailed();
+                throw new Error("Payment failed");
+            }
+
+            ticket.markPaymentSuccessful();
+        }
         const spot = ticket.getParkingSpot();
         spot.removeVehicle();
 
+        ticket.completeTicket();
         this.activeTickets.delete(registrationNo);
+        const receipt :ExitReceipt = {
+            ticketId : ticket.getTicketId(),
+            registrationNo : registrationNo,
+            amountPaid : fee,
+            exitTime : currDate,
+        }
 
         return fee;
     }
