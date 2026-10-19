@@ -28,7 +28,7 @@ export class TickTacToe implements Game {
 
         let sum = 0;
 
-        for (let i = 0; i < lastColumn; i++) {
+        for (let i = 0; i <= lastColumn; i++) {
             const value = this.board.getValue(row, i);
 
             if (value !== undefined) {
@@ -42,7 +42,7 @@ export class TickTacToe implements Game {
         let sum = 0;
         const getLastRow = this.board.getLastRow();
 
-        for (let i = 0; i < getLastRow; i++) {
+        for (let i = 0; i <= getLastRow; i++) {
             const value = this.board.getValue(i, column);
 
             if (value !== undefined) {
