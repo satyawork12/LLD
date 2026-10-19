@@ -2,13 +2,13 @@ import { Board } from "./board.js";
 import type { Game } from "./game.js";
 import type { Player } from "./player.js";
 
-enum gameState{
+enum gameState {
     "Active" = "ACTIVE",
     "Completed" = "COMPLETED"
 }
 
 export class TickTacToe implements Game {
-    private gameState : gameState = gameState.Active;
+    private gameState: gameState = gameState.Active;
     constructor(
         private readonly player: Player[],
         private readonly movePattern: Player[],
@@ -17,17 +17,19 @@ export class TickTacToe implements Game {
     ) { }
 
     sumOfRow(row: number): number {
-        const cells = this.board.getCells();
-        const selectedRow = cells[row];
+        // const cells = this.board.getCells();
+        // const selectedRow = cells[row];
 
-        if (!selectedRow) {
-            throw new Error("Invalid row");
-        }
+        // if (!selectedRow) {
+        //     throw new Error("Invalid row");
+        // }
+        const lastColumn: number = this.board.getLastColumn();
+
 
         let sum = 0;
 
-        for (let i = 0; i < selectedRow.length; i++) {
-            const value = selectedRow[i];
+        for (let i = 0; i < lastColumn; i++) {
+            const value = this.board.getValue(row, i);
 
             if (value !== undefined) {
                 sum += value;
@@ -37,17 +39,11 @@ export class TickTacToe implements Game {
         return sum;
     }
     sumOfColumn(column: number): number {
-        const cells = this.board.getCells();
         let sum = 0;
+        const getLastRow = this.board.getLastRow();
 
-        for (let i = 0; i < cells.length; i++) {
-            const row = cells[i];
-
-            if (!row) {
-                continue;
-            }
-
-            const value = row[column];
+        for (let i = 0; i < getLastRow; i++) {
+            const value = this.board.getValue(i, column);
 
             if (value !== undefined) {
                 sum += value;
@@ -57,20 +53,15 @@ export class TickTacToe implements Game {
         return sum;
     }
     sumOfPrimaryDiagonal(): number {
-        const cells = this.board.getCells();
         let sum = 0;
+        const getLastRow = this.board.getLastRow();
 
-        for (let i = 0; i < cells.length; i++) {
-            const row = cells[i];
-            if (row == undefined) {
-                continue;
-            }
-            const value = row[i];
-            if (value == undefined) {
-                continue;
-            }
+        for (let i = 0; i < getLastRow; i++) {
+            const value = this.board.getValue(i, i);
 
-            sum += value;
+            if (value != undefined) {
+                sum += value;
+            }
 
         }
 
@@ -78,20 +69,19 @@ export class TickTacToe implements Game {
     }
 
     sumOfSecondaryDiagonal(): number {
-        const cells = this.board.getCells();
         let sum = 0;
-        const lastColumn = this.board.getLastColumn();
-        for (let i = 0; i < cells.length; i++) {
-            const row = cells[i];
-            if (row == undefined) {
-                continue;
+        const getLastRow = this.board.getLastRow();
+        const getLastColumn = this.board.getLastColumn();
+
+        for (let i = 0; i < getLastRow; i++) {
+            const value = this.board.getValue(i, getLastColumn - i);
+
+            if (value != undefined) {
+                sum += value;
             }
-            const value = row[lastColumn - i];
-            if (value == undefined) {
-                continue;
-            }
-            sum += value;
+
         }
+
         return sum;
     }
     checkWinner(): boolean {
@@ -150,7 +140,7 @@ export class TickTacToe implements Game {
             throw new Error("Next player not found");
         }
 
-        return nextPlayer; // ✅ TypeScript knows it's Player
+        return nextPlayer; //
     }
 }
 

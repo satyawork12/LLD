@@ -18,11 +18,18 @@ export class Board {
         return this.cells[0]!.length - 1;
     }
 
-    getCells(): number[][] {
-        return this.cells;
-    }
     placeMark(row: number, column: number, value: number): void {
-        this.cells[row]![column] = value;
+        if(this.cells[row]![column]!=undefined){
+            this.cells[row]![column] = value;
+        }
+        else{
+            throw Error("this cell already contains value")
+        }
+    }
+
+    getValue(row: number, column: number): number|undefined {
+        const value = this.cells[row]![column];
+        return value;
     }
 
 }
