@@ -1,19 +1,24 @@
 import { Board } from "./board.js";
 import type { Game } from "./game.js";
+import type { Move, TickTacToeMove } from "./move.js";
 import type { Player } from "./player.js";
 
-enum gameState {
+export enum gameState {
     "Active" = "ACTIVE",
     "Completed" = "COMPLETED"
 }
+export type Mark = "X" | "O";
+     
+
 
 export class TickTacToe implements Game {
     private gameState: gameState = gameState.Active;
+    private currPlayer : Player | null = null;
     constructor(
         private readonly player: Player[],
         private readonly movePattern: Player[],
         private readonly board: Board,
-        private readonly mark: string[],
+        private move : TickTacToeMove,
     ) { }
 
     sumOfRow(row: number): number {
@@ -106,7 +111,11 @@ export class TickTacToe implements Game {
         if (sumOfPrimaryDiagonal == -3 || sumOfPrimaryDiagonal == 3 || sumOfSecondaryDiagonal == 3 || sumOfSecondaryDiagonal == -3) {
             return true;
         }
-        this.gameState = gameState.Completed;
+        const totalMove = this.move.getTotalMove();
+        if(totalMove==9){
+            this.gameState = gameState.Completed;
+            return false;
+        } 
         return false;
     }
 
@@ -141,6 +150,15 @@ export class TickTacToe implements Game {
         }
 
         return nextPlayer; //
+    }
+    getCurrPlayer(){
+        return this.currPlayer;
+    }
+    setCurrPlayer(player:Player){
+        this.currPlayer = player;
+    }
+    getGameState() : gameState{
+        return this.gameState;
     }
 }
 
