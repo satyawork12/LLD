@@ -84,10 +84,10 @@ export class Elevator {
             this.pendingFloor.delete(stops[currIndex]!);
             currIndex++;
         }
-        if (currFloor == this.totalFloor) {
+        if (this.currFloor == this.totalFloor) {
             this.direction = Direction.down;
         }
-        if(currFloor == 0){
+        if(this.currFloor == 1){
             this.direction = Direction.up;
         }
         this.state = ElevatorState.Idle;
