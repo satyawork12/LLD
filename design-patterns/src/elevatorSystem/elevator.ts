@@ -82,12 +82,13 @@ export class Elevator {
             let currFloor = stops[0]!;
             let totalFloor = stops.length;
             let lastFloor = stops[totalFloor - 1]!;
+            let currIndex = 0;
             while (currFloor <= lastFloor) {
-                console.log(`Moving towards ${stops[currFloor]}`);
-                console.log(`opening gate at floor ${stops[currFloor]}`);
+                console.log(`Moving towards ${currFloor}`);
+                console.log(`opening gate at floor ${currFloor}`);
 
-                this.currFloor = stops[currFloor]!;
-                this.pendingFloor.delete(stops[currFloor]!);
+                this.currFloor = currFloor!;
+                this.pendingFloor.delete(currFloor!);
                 if (this.currFloor == this.totalFloor) {
                     this.direction = Direction.down;
                 }
@@ -95,6 +96,7 @@ export class Elevator {
                     this.direction = Direction.up;
                 }
                 currFloor++;
+                currIndex++;
             }
 
         }
