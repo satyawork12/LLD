@@ -67,9 +67,6 @@ export class Elevator {
 
         while (true) {
             let stops = [...this.pendingFloor];
-            if (stops.length == 0) {
-                break;
-            }
             this.state = ElevatorState.Moving;
             if (Direction.up === direction) {
                 stops = stops.filter((stop) => stop >= currFloor)
@@ -78,6 +75,9 @@ export class Elevator {
             else {
                 stops = stops.filter((stop) => stop <= currFloor)
                 stops.sort((a, b) => b - a)
+            }
+            if (stops.length == 0) {
+                break;
             }
             let currFloor = stops[0]!;
             let totalFloor = stops.length;
@@ -89,10 +89,10 @@ export class Elevator {
 
                 this.currFloor = currFloor!;
                 this.pendingFloor.delete(currFloor!);
-                if (this.currFloor == this.totalFloor) {
+                if (currFloor == this.totalFloor) {
                     this.direction = Direction.down;
                 }
-                if (this.currFloor == 1) {
+                if (currFloor == 1) {
                     this.direction = Direction.up;
                 }
                 currFloor++;
