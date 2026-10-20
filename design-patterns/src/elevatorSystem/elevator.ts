@@ -10,7 +10,7 @@ enum ElevatorState {
 }
 
 export class Elevator {
-    private id : number;
+    private id: number;
     private _currFloor: number = 0;
 
     public get currFloor(): number {
@@ -54,7 +54,7 @@ export class Elevator {
 
     private totalFloor: number;
 
-    constructor(totalFloor: number, id:number) {
+    constructor(totalFloor: number, id: number) {
         this.totalFloor = totalFloor;
         this.id = id;
     }
@@ -64,31 +64,39 @@ export class Elevator {
     step() {
         const currFloor = this.currFloor;
         const direction = this.direction;
-        let stops = [...this.pendingFloor];
-        this.state = ElevatorState.Moving;
-        if (Direction.up === direction) {
-            stops = stops.filter((stop) => stop >= currFloor)
-                .sort((a, b) => a - b)
-        }
-        else {
-            stops = stops.filter((stop) => stop <= currFloor)
-            stops.sort((a, b) => b - a)
-        }
-        let currIndex = 0;
-        let totalFloor = stops.length;
-        while (currIndex < totalFloor) {
-            console.log(`Moving towards ${stops[currIndex]}`);
-            console.log(`opening gate at floor ${stops[currIndex]}`);
 
-            this.currFloor = stops[currIndex]!;
-            this.pendingFloor.delete(stops[currIndex]!);
-            currIndex++;
-        }
-        if (this.currFloor == this.totalFloor) {
-            this.direction = Direction.down;
-        }
-        if(this.currFloor == 1){
-            this.direction = Direction.up;
+        while (true) {
+            let stops = [...this.pendingFloor];
+            if (stops.length == 0) {
+                break;
+            }
+            this.state = ElevatorState.Moving;
+            if (Direction.up === direction) {
+                stops = stops.filter((stop) => stop >= currFloor)
+                    .sort((a, b) => a - b)
+            }
+            else {
+                stops = stops.filter((stop) => stop <= currFloor)
+                stops.sort((a, b) => b - a)
+            }
+            let currFloor = stops[0]!;
+            let totalFloor = stops.length;
+            let lastFloor = stops[totalFloor - 1]!;
+            while (currFloor <= lastFloor) {
+                console.log(`Moving towards ${stops[currFloor]}`);
+                console.log(`opening gate at floor ${stops[currFloor]}`);
+
+                this.currFloor = stops[currFloor]!;
+                this.pendingFloor.delete(stops[currFloor]!);
+                if (this.currFloor == this.totalFloor) {
+                    this.direction = Direction.down;
+                }
+                if (this.currFloor == 1) {
+                    this.direction = Direction.up;
+                }
+                currFloor++;
+            }
+
         }
         this.state = ElevatorState.Idle;
     }
@@ -96,7 +104,7 @@ export class Elevator {
     addStop(floor: number, direction: Direction): boolean {
         const currDirection = this.direction;
         const currFloor = this.currFloor;
-        if(this.state==ElevatorState.Idle){
+        if (this.state == ElevatorState.Idle) {
             this.direction = direction;
             this.pendingFloor = floor;
             this.state = ElevatorState.Moving;
