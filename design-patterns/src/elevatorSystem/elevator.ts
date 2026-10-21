@@ -61,46 +61,17 @@ export class Elevator {
 
 
 
-    step() {
-        const currFloor = this.currFloor;
-        const direction = this.direction;
-
-        while (true) {
-            let stops = [...this.pendingFloor];
-            this.state = ElevatorState.Moving;
-            if (Direction.up === direction) {
-                stops = stops.filter((stop) => stop >= currFloor)
-                    .sort((a, b) => a - b)
-            }
-            else {
-                stops = stops.filter((stop) => stop <= currFloor)
-                stops.sort((a, b) => b - a)
-            }
-            if (stops.length == 0) {
-                break;
-            }
-            let currFloor = stops[0]!;
-            let totalFloor = stops.length;
-            let lastFloor = stops[totalFloor - 1]!;
-            let currIndex = 0;
-            while (currFloor <= lastFloor) {
-                console.log(`Moving towards ${currFloor}`);
-                console.log(`opening gate at floor ${currFloor}`);
-
-                this.currFloor = currFloor!;
-                this.pendingFloor.delete(currFloor!);
-                if (currFloor == this.totalFloor) {
-                    this.direction = Direction.down;
-                }
-                if (currFloor == 1) {
-                    this.direction = Direction.up;
-                }
-                currFloor++;
-                currIndex++;
-            }
-
+    step(floor:number) {
+        if(this.pendingFloor.size==0){
+            return;
         }
-        this.state = ElevatorState.Idle;
+        if(this.currFloor>floor){
+            this.currFloor++;
+        }
+        if(this.currFloor<floor){
+            this.currFloor--;
+        }
+        
     }
 
     addStop(floor: number, direction: Direction): boolean {
