@@ -6,8 +6,10 @@ import { Price } from "./price.js";
 
 export class BookingManager {
     private bookingPeriod: Booking[] = [];
-    private payment: Payment = new Payment();
-    private price: Price = new Price();
+
+    constructor(private payment: Payment,
+    private price: Price){}
+
     isCarAvailable(car: Car, carId: number, startTime: Date, endTime: Date): boolean | null {
         const carStatus = car.getStatus();
         if (carStatus == CarStatus.UnderMaintenance) {
@@ -19,11 +21,8 @@ export class BookingManager {
             const bookedStart = bookedCar.startTime;
             const bookedEnd = bookedCar.endTime
 
-            if ((bookedStart <= startTime && startTime < bookedEnd ||
-                bookedStart < endTime && endTime < bookedEnd ||
-                (bookedStart < startTime && startTime < bookedEnd) && (bookedStart < endTime && endTime < bookedEnd) ||
-                (bookedStart > startTime && bookedEnd < endTime)
-            )) {
+            const isOverLap = startTime<bookedEnd && endTime>bookedStart;
+            if(isOverLap){
                 isAvailable = false;
             }
         }
