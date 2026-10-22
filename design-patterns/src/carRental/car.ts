@@ -13,5 +13,8 @@ export class Car{
         this.id = id;
         this.status = status;
     }
+    getStatus(){
+        return this.status;
+    }
 
 }

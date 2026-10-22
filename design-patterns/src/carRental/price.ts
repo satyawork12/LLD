@@ -1,11 +1,18 @@
 
 
 export class Price {
-    carId : number;
-    price : number;
+    priceMap : Map<number,number>=new Map();
 
-    constructor(carId:number , price:number){
-        this.carId = carId,
-        this.price = price
+    addPrice(carId:number,price:number){
+        this.priceMap.set(carId,price);
     }
+    getPrice(carId:number):number|null{
+        const price = this.priceMap.get(carId);
+        if(price!=undefined){
+            return price;
+        }
+        return null;
+    }
+
+
 }
