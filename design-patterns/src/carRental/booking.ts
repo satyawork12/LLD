@@ -19,9 +19,14 @@ export class Booking{
         return this._car;
     }
   
-    private bookingId : string ;
+    private _bookingId: string;
+    public get bookingId(): string {
+        return this._bookingId;
+    }
     private userId : number;
     private totalAmount : number;
+
+
 
     
     constructor(_car:Car,_carId:number,_startime:Date, _endTime:Date,bookingId:string,userId : number,totalAmount : number){
@@ -29,7 +34,7 @@ export class Booking{
         this._startTime = _startime;
         this._endTime = _endTime;
         this._car = _car;
-        this.bookingId = bookingId;
+        this._bookingId = bookingId;
         this.userId = userId;
         this.totalAmount = totalAmount;
     }
