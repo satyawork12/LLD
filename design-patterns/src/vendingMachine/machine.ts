@@ -60,7 +60,7 @@ export class Machine {
         return productList;
     }
     buy(productId: string) {
-        if (this.currTransaction != null) {
+        if (this.currTransaction == null) {
             this.currTransaction = {
                 paymentStatus: "Pending",
                 dispenseStatus: "Pending",
@@ -68,13 +68,18 @@ export class Machine {
             }
         }
         const isPaymentDone = this.currTransaction?.paymentStatus;
-        let productObj : Product | null = null;
-        if (!isPaymentDone) {
+        let productObj: Product | null = null;
+        for (let product of this.productList) {
+            if (product.id == productId) {
+                productObj = product;
+
+            }
+        }
+        if (isPaymentDone === "Pending") {
             try {
                 let productFee = null;
                 for (let product of this.productList) {
                     if (product.id == productId) {
-                        productObj = product;
                         productFee = product.price;
                     }
                 }
@@ -100,7 +105,7 @@ export class Machine {
                     throw new Error("Product location is not found")
                 }
                 const isDispenseSucceed = this.dispense.dispense(productLocation)
-                if(isDispenseSucceed){
+                if (isDispenseSucceed) {
                     this.currTransaction!.dispenseStatus = "Sucess"
                 }
 
@@ -110,18 +115,23 @@ export class Machine {
             }
 
         }
-        if(productObj==null){
+        if (productObj == null) {
             throw new Error("Product obj is not found ")
         }
-        try{
+        try {
 
             this.reduceOneQtyOfProductFromMachine(productObj);
             this.currTransaction!.ProductQtyUpdated = true;
         }
-        catch{
+        catch {
             throw new Error("There is an error updating the stock")
         }
-        
+        const shouldTransactionBeCompleted = this.currTransaction?.ProductQtyUpdated == true &&
+            this.currTransaction.dispenseStatus === "Sucess" &&
+            this.currTransaction.paymentStatus === "Paid";
+        if (shouldTransactionBeCompleted) {
+            this.currTransaction = null;
+        }
     }
 
 }
