@@ -8,7 +8,7 @@ interface CurrTransaction {
     dispenseStatus: "Sucess" | "Pending";
     ProductQtyUpdated: boolean;
     productId: string,
-    transactionId : string | null;
+    transactionId: string | null;
 }
 
 export class Machine {
@@ -60,7 +60,7 @@ export class Machine {
                 dispenseStatus: "Pending",
                 ProductQtyUpdated: false,
                 productId: productId,
-                transactionId : null,
+                transactionId: null,
 
             }
         }
@@ -89,14 +89,19 @@ export class Machine {
                 if (productFee == null) {
                     throw new Error("Productfee is not found")
                 }
+                if (this.qty.get(productId) == 0) {
+                    throw new Error("product is out of stock");
+                }
 
-                const paymentSuccessful = this.payment.pay(productFee);
-                if (!paymentSuccessful) {
+                const paymentId = this.payment.pay(productFee);
+
+                if (paymentId === null) {
                     throw new Error("Payment failed");
                 }
 
+
                 this.currTransaction!.paymentStatus = "Paid";
-                this.currTransaction!.transactionId = paymentSuccessful;
+                this.currTransaction!.transactionId = paymentId;
             }
             catch (error) {
                 throw new Error("Payment failed")
@@ -112,7 +117,7 @@ export class Machine {
                 }
                 const isDispenseSucceed = this.dispense.dispense(productLocation)
                 if (!isDispenseSucceed) {
-                    if(this.currTransaction.transactionId!=null){
+                    if (this.currTransaction.transactionId != null) {
 
                         this.payment.refund(this.currTransaction.transactionId);
                     }
@@ -132,8 +137,8 @@ export class Machine {
                 this.reduceOneQtyOfProductFromMachine(productObj);
                 this.currTransaction!.ProductQtyUpdated = true;
             }
-            
-            
+
+
 
         }
         catch {
