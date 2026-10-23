@@ -4,7 +4,7 @@
 
 
 export class Payment{
-    pay(amount:number){
+    pay(amount:number):boolean{
         return true;
     }
 }
