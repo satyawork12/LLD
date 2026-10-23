@@ -4,7 +4,10 @@
 
 
 export class Payment{
-    pay(amount:number):boolean{
+    pay(amount:number):string{
+        return crypto.randomUUID();
+    }
+    refund(transactionId:string):boolean{
         return true;
     }
 }

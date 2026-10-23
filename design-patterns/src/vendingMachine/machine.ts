@@ -7,6 +7,8 @@ interface CurrTransaction {
     paymentStatus: "Paid" | "Pending";
     dispenseStatus: "Sucess" | "Pending";
     ProductQtyUpdated: boolean;
+    productId: string,
+    transactionId : string | null;
 }
 
 export class Machine {
@@ -20,13 +22,13 @@ export class Machine {
 
     addProductToMachine(product: Product, qty: number) {
         const productId = product.id;
+        if (!this.arrangementOfProduct.has(productId)) {
+            throw new Error(`location for that product is not defined`);
+        }
         this.products.add(productId);
         this.qty.set(productId, this.qty.getOrInsert(productId, 0) + qty);
         this.productList.add(product);
 
-        if (!this.arrangementOfProduct.has(productId)) {
-            throw new Error(`location for that product is not defined`);
-        }
 
     }
     reduceOneQtyOfProductFromMachine(product: Product) {
@@ -40,14 +42,6 @@ export class Machine {
             throw new Error(`product is not available ${productId}`);
         }
         this.qty.set(productId, currQty! - 1);
-        if (currQty! - 1 == 0) {
-            this.products.delete(productId);
-            for (let product of this.productList) {
-                if (product.id === productId) {
-                    this.productList.delete(product);
-                }
-            }
-        }
     }
     defineLocationDForProduct(productId: string, location: [number, number]) {
         this.arrangementOfProduct.set(productId, location)
@@ -65,7 +59,13 @@ export class Machine {
                 paymentStatus: "Pending",
                 dispenseStatus: "Pending",
                 ProductQtyUpdated: false,
+                productId: productId,
+                transactionId : null,
+
             }
+        }
+        if (this.currTransaction.productId != productId) {
+            throw new Error("finish the current transcation then start new one")
         }
         const isPaymentDone = this.currTransaction?.paymentStatus;
         let productObj: Product | null = null;
@@ -74,6 +74,9 @@ export class Machine {
                 productObj = product;
 
             }
+        }
+        if (productObj == null) {
+            throw new Error("Product obj is not found ")
         }
         if (isPaymentDone === "Pending") {
             try {
@@ -93,6 +96,7 @@ export class Machine {
                 }
 
                 this.currTransaction!.paymentStatus = "Paid";
+                this.currTransaction!.transactionId = paymentSuccessful;
             }
             catch (error) {
                 throw new Error("Payment failed")
@@ -108,22 +112,29 @@ export class Machine {
                 }
                 const isDispenseSucceed = this.dispense.dispense(productLocation)
                 if (!isDispenseSucceed) {
+                    if(this.currTransaction.transactionId!=null){
+
+                        this.payment.refund(this.currTransaction.transactionId);
+                    }
                     throw new Error("Dispense failed ")
                 }
                 this.currTransaction!.dispenseStatus = "Sucess"
             }
             catch {
+
                 throw new Error("Dispense failed");
             }
 
         }
-        if (productObj == null) {
-            throw new Error("Product obj is not found ")
-        }
-        try {
 
-            this.reduceOneQtyOfProductFromMachine(productObj);
-            this.currTransaction!.ProductQtyUpdated = true;
+        try {
+            if (!this.currTransaction.ProductQtyUpdated) {
+                this.reduceOneQtyOfProductFromMachine(productObj);
+                this.currTransaction!.ProductQtyUpdated = true;
+            }
+            
+            
+
         }
         catch {
             throw new Error("There is an error updating the stock")
