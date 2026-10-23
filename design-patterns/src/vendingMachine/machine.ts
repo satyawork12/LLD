@@ -87,10 +87,12 @@ export class Machine {
                     throw new Error("Productfee is not found")
                 }
 
-                const pay = this.payment.pay(productFee);
-                if (pay) {
-                    this.currTransaction!.paymentStatus = "Paid";
+                const paymentSuccessful = this.payment.pay(productFee);
+                if (!paymentSuccessful) {
+                    throw new Error("Payment failed");
                 }
+
+                this.currTransaction!.paymentStatus = "Paid";
             }
             catch (error) {
                 throw new Error("Payment failed")
@@ -105,10 +107,10 @@ export class Machine {
                     throw new Error("Product location is not found")
                 }
                 const isDispenseSucceed = this.dispense.dispense(productLocation)
-                if (isDispenseSucceed) {
-                    this.currTransaction!.dispenseStatus = "Sucess"
+                if (!isDispenseSucceed) {
+                    throw new Error("Dispense failed ")
                 }
-
+                this.currTransaction!.dispenseStatus = "Sucess"
             }
             catch {
                 throw new Error("Dispense failed");
