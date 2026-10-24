@@ -4,12 +4,13 @@
     // File Layout
     // "rootDir": "./src",
     // "outDir": "./dist",
+     "moduleResolution": "NodeNext",  // Or "Node16" if you are targeting older setups  
 
     // Environment Settings
     // See also https://aka.ms/tsconfig/module
     "module": "nodenext",
     "target": "esnext",
-    "types": [],
+    "types": ["node"],
     // For nodejs:
     // "lib": ["esnext"],
     // "types": ["node"],
