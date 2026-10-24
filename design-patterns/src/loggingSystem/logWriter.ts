@@ -7,13 +7,13 @@ export interface LogWriter {
 
 }
 
-class ConsoleWriter implements LogWriter {
+export class ConsoleWriter implements LogWriter {
     write(message: String): void {
         console.log(message)
     }
 }
 
-class FileWriter implements LogWriter {
+export class FileWriter implements LogWriter {
     async write(message: String): Promise<void> {
         const filePath = "./loggerFile.txt";
         try {
