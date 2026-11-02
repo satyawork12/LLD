@@ -25,10 +25,10 @@ export abstract class SnakeAndLadder {
 }
 
 
-class StandardSnakeAndLadder extends SnakeAndLadder {
+export class StandardSnakeAndLadder extends SnakeAndLadder {
     checkWinner(): boolean {
          const winnerFound = this.players.some((player)=>
-            player.currentPosition===100
+            player.currentPosition===this.board.row * this.board.column
         )
         return winnerFound
     }
