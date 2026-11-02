@@ -27,9 +27,9 @@ export abstract class SnakeAndLadder {
 
 class StandardSnakeAndLadder extends SnakeAndLadder {
     checkWinner(): boolean {
-         const winnerFound = this.players.some((player)=>{
-            player.currentPosition===100;
-        })
+         const winnerFound = this.players.some((player)=>
+            player.currentPosition===100
+        )
         return winnerFound
     }
     playTurn(player: Player): void {
@@ -51,16 +51,16 @@ class StandardSnakeAndLadder extends SnakeAndLadder {
         
     }
     checkSnakeBite(player: Player): Snake | null{
-        const snakeWhichBites = this.board.snakes.find((snake)=>{
-            player.currentPosition===snake.startHead;
-        })
+        const snakeWhichBites = this.board.snakes.find((snake)=>
+            player.currentPosition===snake.startHead
+        )
         return snakeWhichBites ?? null;
     };
 
     checkLadderClimb(player: Player): Ladder | null{
-         const ladder = this.board.ladders.find((ladder)=>{
-            player.currentPosition===ladder.end;
-        })
+         const ladder = this.board.ladders.find((ladder)=>
+            player.currentPosition===ladder.end
+        )
         return ladder ?? null;
     };
 }
