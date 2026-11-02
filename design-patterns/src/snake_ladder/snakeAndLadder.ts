@@ -41,18 +41,21 @@ export class StandardSnakeAndLadder extends SnakeAndLadder {
         }
         const steps = this.dice.throwDice();
         const currPlayer = this.turnSequencePlayers.shift();
+        if(currPlayer==undefined){
+            return ;
+        }
         this.turnSequencePlayers.push(currPlayer!);
-        if(player.currentPosition + steps > this.board.row * this.board.column){
+        if(currPlayer.currentPosition + steps > this.board.row * this.board.column){
             return;
         }
-        player.currentPosition = player.currentPosition + steps;
-        const isSnakeBite = this.checkSnakeBite(player);
+        currPlayer.currentPosition = currPlayer.currentPosition + steps;
+        const isSnakeBite = this.checkSnakeBite(currPlayer);
         if(isSnakeBite!=null){
-            player.currentPosition = isSnakeBite.tail;
+            currPlayer.currentPosition = isSnakeBite.tail;
         }
-        const isLadderClimbed = this.checkLadderClimb(player);
+        const isLadderClimbed = this.checkLadderClimb(currPlayer);
         if(isLadderClimbed!=null){
-            player.currentPosition = isLadderClimbed.to;
+            currPlayer.currentPosition = isLadderClimbed.to;
         }
         if(this.checkWinner()){
             this.gameState = GameState.Won;
