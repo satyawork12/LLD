@@ -35,7 +35,7 @@ export class StandardSnakeAndLadder extends SnakeAndLadder {
         )
         return winnerFound
     }
-    playTurn(player: Player): void {
+    playTurn(): void {
         if (this.gameState === GameState.Won) {
             return;
         }
