@@ -1,4 +1,5 @@
 export abstract class Dice {
+    
     constructor(
         public readonly faces: number,
     ) { }
@@ -8,8 +9,12 @@ export abstract class Dice {
 
 
 export class SixSidedDice extends Dice{
+    
+    constructor(faces:number){
+        super(faces);
+    }
     throwDice(): number {
-        const randomNumber = Math.floor(Math.random()*6 + 1);
+        const randomNumber = Math.floor(Math.random()*this.faces + 1);
         return randomNumber;
     }
 }

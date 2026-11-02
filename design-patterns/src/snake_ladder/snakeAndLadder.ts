@@ -4,9 +4,11 @@ import type { Ladder } from "./ladder.js";
 import type { Player } from "./player.js";
 import type { Snake } from "./snake.js";
 
+enum GameState {
+    Active = "ACTIVE",
+    Won = "WON"
+}
 export abstract class SnakeAndLadder {
-    protected turnSequence: Player[] = [];
-
     constructor(
         protected readonly board: Board,
         protected readonly players: Player[],
@@ -26,6 +28,7 @@ export abstract class SnakeAndLadder {
 
 
 export class StandardSnakeAndLadder extends SnakeAndLadder {
+    private gameState : GameState = GameState.Active;
     checkWinner(): boolean {
          const winnerFound = this.players.some((player)=>
             player.currentPosition===this.board.row * this.board.column
@@ -33,10 +36,13 @@ export class StandardSnakeAndLadder extends SnakeAndLadder {
         return winnerFound
     }
     playTurn(player: Player): void {
+        if(this.gameState===GameState.Won){
+            return ;
+        }
         const steps = this.dice.throwDice();
-        const currPlayer = this.turnSequence.shift();
-        this.turnSequence.push(currPlayer!);
-        if(player.currentPosition + steps > 100){
+        const currPlayer = this.turnSequencePlayers.shift();
+        this.turnSequencePlayers.push(currPlayer!);
+        if(player.currentPosition + steps > this.board.row * this.board.column){
             return;
         }
         player.currentPosition = player.currentPosition + steps;
@@ -48,7 +54,9 @@ export class StandardSnakeAndLadder extends SnakeAndLadder {
         if(isLadderClimbed!=null){
             player.currentPosition = isLadderClimbed.to;
         }
-        
+        if(this.checkWinner()){
+            this.gameState = GameState.Won;
+        }
         
     }
     checkSnakeBite(player: Player): Snake | null{
