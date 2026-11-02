@@ -34,6 +34,8 @@ class StandardSnakeAndLadder extends SnakeAndLadder {
     }
     playTurn(player: Player): void {
         const steps = this.dice.throwDice();
+        const currPlayer = this.turnSequence.shift();
+        this.turnSequence.push(currPlayer!);
         if(player.currentPosition + steps > 100){
             return;
         }
@@ -46,8 +48,7 @@ class StandardSnakeAndLadder extends SnakeAndLadder {
         if(isLadderClimbed!=null){
             player.currentPosition = isLadderClimbed.to;
         }
-        const currPlayer = this.turnSequence.shift();
-        this.turnSequence.push(currPlayer!);
+        
         
     }
     checkSnakeBite(player: Player): Snake | null{
