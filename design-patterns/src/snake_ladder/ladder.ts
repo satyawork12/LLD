@@ -1,7 +1,7 @@
 export class Ladder {
     constructor(
         public readonly id: number,
-        public readonly start: number,
-        public readonly end: number,
+        public readonly from: number,
+        public readonly to: number,
     ) { }
 }

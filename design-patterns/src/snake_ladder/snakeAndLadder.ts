@@ -44,7 +44,7 @@ class StandardSnakeAndLadder extends SnakeAndLadder {
         }
         const isLadderClimbed = this.checkLadderClimb(player);
         if(isLadderClimbed!=null){
-            player.currentPosition = isLadderClimbed.start;
+            player.currentPosition = isLadderClimbed.to;
         }
         const currPlayer = this.turnSequence.shift();
         this.turnSequence.push(currPlayer!);
@@ -59,7 +59,7 @@ class StandardSnakeAndLadder extends SnakeAndLadder {
 
     checkLadderClimb(player: Player): Ladder | null{
          const ladder = this.board.ladders.find((ladder)=>
-            player.currentPosition===ladder.end
+            player.currentPosition===ladder.from
         )
         return ladder ?? null;
     };
