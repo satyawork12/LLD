@@ -13,7 +13,7 @@ export class BookingRepository {
 
     getByUserId(userId: string): Booking[] {
         return Array.from(this.bookings.values()).filter(
-            (booking) => booking.bookedByUser === userId
+            (booking) => booking.bookedByUser.id === userId
         );
     }
 
