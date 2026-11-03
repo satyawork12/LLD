@@ -1,0 +1,82 @@
+import { randomUUID } from "node:crypto";
+import { Booking, BookingStatus, PaymentStatus } from "./booking.js";
+import { Payment } from "./payment.js";
+import { ShowRepository } from "./showRepository.js";
+import { ShowSeat, ShowSeatStatus } from "./showSeat.js";
+import { BookingRepository } from "./bookingRepository.js";
+import { UserRepository } from "./userRepository.js";
+
+export class BookingService {
+    private showRepository: ShowRepository = new ShowRepository();
+    private paymentService: Payment = new Payment();
+    private bookingRepository : BookingRepository = new BookingRepository();
+    private userRepository : UserRepository = new UserRepository();
+
+    book(seatIds: string[], showId: string, userId: string): Booking {
+        // 1. Get the show
+        const show = this.showRepository.getById(showId);
+
+        if (!show) {
+            throw new Error("Show not found");
+        }
+
+        // 2. Validate and collect all selected ShowSeat objects
+        const selectedShowSeats: ShowSeat[] = seatIds.map((id) => {
+            const seat = show.getShowSeat(id);
+
+            if (!seat || seat.status !== ShowSeatStatus.Available) {
+                throw new Error(`Seat ${id} is unavailable`);
+            }
+
+            return seat;
+        });
+
+        // 3. Lock all selected seats
+        const lockExpiry = new Date(Date.now() + 5 * 60 * 1000);
+
+        let totalAmount = 0;
+
+        for (const seat of selectedShowSeats) {
+            seat.lock(userId, lockExpiry);
+            totalAmount += seat.price;
+        }
+
+        // 4. Process payment
+        try {
+            const paymentSuccessful = this.paymentService.pay(totalAmount);
+
+            if (!paymentSuccessful) {
+                throw new Error("Payment failed");
+            }
+
+            // 5. Create and confirm booking
+            const booking = new Booking(
+                randomUUID(),
+                this.userRepository.getById(userId)!,
+                selectedShowSeats,
+                showId,
+                totalAmount,
+                PaymentStatus.Paid,
+                BookingStatus.Confirmed
+            );
+
+            // 6. Mark seats as booked
+            for (const seat of selectedShowSeats) {
+                seat.book();
+            }
+
+            // 7. Store booking
+            this.bookingRepository.save(booking);
+
+            return booking;
+
+        } catch (error) {
+            // Release locks if payment or booking processing fails
+            for (const seat of selectedShowSeats) {
+                seat.release();
+            }
+
+            throw error;
+        }
+    }
+}

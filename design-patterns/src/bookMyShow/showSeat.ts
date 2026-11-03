@@ -46,4 +46,5 @@ export class ShowSeat {
         this._lockedBy = null;
         this._lockedExpiry = null;
     }
+    
 }

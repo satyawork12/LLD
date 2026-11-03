@@ -27,4 +27,9 @@ export class Show {
     getShowSeats(): readonly ShowSeat[] {
         return [...this._showSeats];
     }
+    getShowSeat(seatId: string): ShowSeat | undefined {
+        return this._showSeats.find(
+            showSeat => showSeat.seatId === seatId
+        );
+    }
 }
