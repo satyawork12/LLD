@@ -25,4 +25,4 @@ const theatre = new Theatre(
 
 console.log("Theatre:", theatre);
 console.log("Screen:", screen);
-console.log("Seats:", screen.seats);
+console.log("Seats:", screen.getSeats());
