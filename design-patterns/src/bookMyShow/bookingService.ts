@@ -5,15 +5,25 @@ import { ShowRepository } from "./showRepository.js";
 import { ShowSeat, ShowSeatStatus } from "./showSeat.js";
 import { BookingRepository } from "./bookingRepository.js";
 import { UserRepository } from "./userRepository.js";
+import { error } from "node:console";
 
 export class BookingService {
-    private showRepository: ShowRepository = new ShowRepository();
-    private paymentService: Payment = new Payment();
-    private bookingRepository : BookingRepository = new BookingRepository();
-    private userRepository : UserRepository = new UserRepository();
-
+    constructor(
+        private readonly showRepository: ShowRepository,
+        private readonly paymentService: Payment,
+        private readonly bookingRepository: BookingRepository,
+        private readonly userRepository: UserRepository,
+    ) { }
     book(seatIds: string[], showId: string, userId: string): Booking {
         // 1. Get the show
+        if (new Set(seatIds).size !== seatIds.length) {
+            throw new Error("Duplicate seats selected");
+        }
+
+        if (seatIds.length === 0) {
+            throw new Error("Select at least one seat");
+        }
+
         const show = this.showRepository.getById(showId);
 
         if (!show) {
@@ -36,23 +46,33 @@ export class BookingService {
 
         let totalAmount = 0;
 
-        for (const seat of selectedShowSeats) {
-            seat.lock(userId, lockExpiry);
-            totalAmount += seat.price;
-        }
-
-        // 4. Process payment
         try {
-            const paymentSuccessful = this.paymentService.pay(totalAmount);
 
-            if (!paymentSuccessful) {
+            for (const seat of selectedShowSeats) {
+
+
+                seat.lock(userId, lockExpiry);
+                totalAmount += seat.price;
+
+            }
+
+            // 4. Process payment
+
+            const transactionId = this.paymentService.pay(totalAmount);
+
+            if (!transactionId) {
                 throw new Error("Payment failed");
+            }
+            const user = this.userRepository.getById(userId);
+
+            if (!user) {
+                throw new Error("User not found");
             }
 
             // 5. Create and confirm booking
             const booking = new Booking(
                 randomUUID(),
-                this.userRepository.getById(userId)!,
+                user,
                 selectedShowSeats,
                 showId,
                 totalAmount,
