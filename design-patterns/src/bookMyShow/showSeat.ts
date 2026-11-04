@@ -24,7 +24,8 @@ export class ShowSeat {
     get price(): number { return this._price; }
 
     lock(userId: string, expiry: Date): void {
-        if (this._status !== ShowSeatStatus.Available) {
+        const now = new Date();
+        if (this._status === ShowSeatStatus.Booked || (this.status == ShowSeatStatus.Locked && this.lockedExpiry! > now)) {
             throw new Error(`Seat ${this._seatId} is not available`);
         }
         this._status = ShowSeatStatus.Locked;
@@ -32,19 +33,25 @@ export class ShowSeat {
         this._lockedExpiry = new Date(expiry);
     }
 
-    book(): void {
+    book(userId : string): void {
         if (this._status !== ShowSeatStatus.Locked) {
             throw new Error(`Seat ${this._seatId} must be locked before booking`);
+        }
+        if(this._lockedBy!=userId){
+            throw new Error("seat is locked by other user")
         }
         this._status = ShowSeatStatus.Booked;
         this._lockedBy = null;
         this._lockedExpiry = null;
     }
 
-    release(): void {
+    release(userId : string): void {
+         if(this._lockedBy!=userId){
+            throw new Error("seat is locked by other user so you can't unlocked it")
+        }
         this._status = ShowSeatStatus.Available;
         this._lockedBy = null;
         this._lockedExpiry = null;
     }
-    
+
 }

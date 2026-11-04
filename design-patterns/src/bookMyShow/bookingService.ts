@@ -62,7 +62,7 @@ export class BookingService {
 
             // 6. Mark seats as booked
             for (const seat of selectedShowSeats) {
-                seat.book();
+                seat.book(userId);
             }
 
             // 7. Store booking
@@ -73,7 +73,7 @@ export class BookingService {
         } catch (error) {
             // Release locks if payment or booking processing fails
             for (const seat of selectedShowSeats) {
-                seat.release();
+                seat.release(userId);
             }
 
             throw error;
